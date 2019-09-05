@@ -215,7 +215,7 @@ class CircleRectScreenView(ctx : Context) : View(ctx) {
         fun create(activity : Activity) : CircleRectScreenView {
             val view : CircleRectScreenView = CircleRectScreenView(activity)
             activity.setContentView(view)
-            return view 
+            return view
         }
     }
 }
