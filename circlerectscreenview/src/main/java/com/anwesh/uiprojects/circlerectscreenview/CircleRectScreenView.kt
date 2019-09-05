@@ -114,8 +114,52 @@ class CircleRectScreenView(ctx : Context) : View(ctx) {
 
         fun stop() {
             if (animated) {
-                animated = false 
+                animated = false
             }
+        }
+    }
+
+    data class CRSNode(var i : Int, val state : State = State()) {
+
+        private var next : CRSNode? = null
+        private var prev : CRSNode? = null
+
+        init {
+            addNeighbor()
+        }
+
+        fun addNeighbor() {
+            if (i < colors.size - 1) {
+                next = CRSNode(i + 1)
+                next?.prev = this
+            }
+        }
+
+        fun draw(canvas : Canvas, sc : Float, paint : Paint) {
+            canvas.drawCRSNode(i, state.scale, sc, paint)
+            if (state.scale > 0f) {
+                next?.draw(canvas, state.scale, paint)
+            }
+        }
+
+        fun update(cb : (Float) -> Unit) {
+            state.update(cb)
+        }
+
+        fun startUpdating(cb : () -> Unit) {
+            state.startUpdating(cb)
+        }
+
+        fun getNext(dir : Int, cb : () -> Unit) : CRSNode {
+            var curr : CRSNode? = prev
+            if (dir == 1) {
+                curr = next
+            }
+            if (curr != null) {
+                return curr
+            }
+            cb()
+            return this 
         }
     }
 }
