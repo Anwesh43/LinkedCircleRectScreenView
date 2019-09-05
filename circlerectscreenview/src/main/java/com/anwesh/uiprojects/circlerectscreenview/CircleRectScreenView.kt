@@ -209,4 +209,13 @@ class CircleRectScreenView(ctx : Context) : View(ctx) {
             }
         }
     }
+
+    companion object {
+
+        fun create(activity : Activity) : CircleRectScreenView {
+            val view : CircleRectScreenView = CircleRectScreenView(activity)
+            activity.setContentView(view)
+            return view 
+        }
+    }
 }
