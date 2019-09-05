@@ -186,4 +186,26 @@ class CircleRectScreenView(ctx : Context) : View(ctx) {
             curr.startUpdating(cb)
         }
     }
+
+    data class Renderer(var view : CircleRectScreenView) {
+
+        private val animator : Animator = Animator(view)
+        private val crs : CircleRectScreen = CircleRectScreen(0)
+
+        fun render(canvas : Canvas, paint : Paint) {
+            canvas.drawColor(backColor)
+            crs.draw(canvas, paint)
+            animator.animate {
+                crs.update {
+                    animator.stop()
+                }
+            }
+        }
+
+        fun handleTap() {
+            crs.startUpdating {
+                animator.start()
+            }
+        }
+    }
 }
