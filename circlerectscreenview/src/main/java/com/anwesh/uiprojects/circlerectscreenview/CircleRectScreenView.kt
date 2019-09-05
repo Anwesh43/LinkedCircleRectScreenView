@@ -29,7 +29,7 @@ fun Canvas.drawRectScreen(x : Float, y : Float, size : Float, sc1 : Float, sc2 :
     if (sc2 > 0f) {
         w = size * sc2
     }
-    drawRect(RectF(x + size * sc1, y - size / 2, x + size, y + size / 2), paint)
+    drawRect(RectF(x + size * sc1, y - size / 2, x + w, y + size / 2), paint)
 }
 fun Canvas.drawCircleRect(size : Float, sc1 : Float, sc2 : Float, paint : Paint) {
     val path : Path = Path()
@@ -40,7 +40,7 @@ fun Canvas.drawCircleRect(size : Float, sc1 : Float, sc2 : Float, paint : Paint)
 
 fun Canvas.drawCircleRectScreen(size : Float, sc1 : Float, sc2 : Float, paint : Paint) {
     drawRectScreen(-size, 0f, size, sc1.divideScale(0, 2), sc2.divideScale(0, 2), paint)
-    drawCircleRect(size, sc1, sc2, paint)
+    drawCircleRect(size, sc1.divideScale(1, 2), sc2.divideScale(1, 2), paint)
 }
 
 fun Canvas.drawCRSNode(i : Int, scale : Float, sc : Float, paint : Paint) {
