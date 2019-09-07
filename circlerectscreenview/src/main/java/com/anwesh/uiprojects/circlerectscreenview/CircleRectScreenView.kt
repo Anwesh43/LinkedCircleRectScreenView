@@ -24,33 +24,36 @@ fun Int.inverse() : Float = 1f / this
 fun Float.maxScale(i : Int, n : Int) : Float = Math.max(0f, this - i * n.inverse())
 fun Float.divideScale(i : Int, n : Int) : Float = Math.min(n.inverse(), maxScale(i, n)) * n
 
-fun Canvas.drawRectScreen(x : Float, y : Float, size : Float, sc1 : Float, sc2 : Float, paint : Paint) {
-    var w : Float = size
+fun Canvas.drawRectScreen(x : Float, y : Float, size : Float, sc1 : Float, sc2 : Float, shouldFill : Boolean, paint : Paint) {
+    var w : Float = 0f
     if (sc2 > 0f) {
         w = size * sc2
     }
+    if (shouldFill) {
+        w = size
+    }
     drawRect(RectF(x + size * sc1, y - size / 2, x + w, y + size / 2), paint)
 }
-fun Canvas.drawCircleRect(size : Float, sc1 : Float, sc2 : Float, paint : Paint) {
+fun Canvas.drawCircleRect(size : Float, sc1 : Float, sc2 : Float, shouldFill: Boolean, paint : Paint) {
     val path : Path = Path()
     path.addCircle(size / 2, 0f, size / 2, Path.Direction.CW);
     clipPath(path)
-    drawRectScreen(0f, 0f, size, sc1, sc2, paint)
+    drawRectScreen(0f, 0f, size, sc1, sc2, shouldFill, paint)
 }
 
-fun Canvas.drawCircleRectScreen(size : Float, sc1 : Float, sc2 : Float, paint : Paint) {
-    drawRectScreen(-size, 0f, size, sc1.divideScale(0, 2), sc2.divideScale(0, 2), paint)
-    drawCircleRect(size, sc1.divideScale(1, 2), sc2.divideScale(1, 2), paint)
+fun Canvas.drawCircleRectScreen(size : Float, sc1 : Float, sc2 : Float, shouldFill: Boolean, paint : Paint) {
+    drawRectScreen(-size, 0f, size, sc1.divideScale(0, 2), sc2.divideScale(0, 2), shouldFill, paint)
+    drawCircleRect(size, sc1.divideScale(1, 2), sc2.divideScale(1, 2), shouldFill, paint)
 }
 
-fun Canvas.drawCRSNode(i : Int, scale : Float, sc : Float, paint : Paint) {
+fun Canvas.drawCRSNode(i : Int, scale : Float, sc : Float, currI : Int, paint : Paint) {
     val w : Float = width.toFloat()
     val h : Float = height.toFloat()
     val size : Float = Math.min(w, h) / sizeFactor
     paint.color = Color.parseColor(colors[i])
     save()
     translate(w / 2, h / 2)
-    drawCircleRectScreen(size, scale, sc, paint)
+    drawCircleRectScreen(size, scale, sc, i == currI, paint)
     restore()
 }
 
@@ -136,10 +139,10 @@ class CircleRectScreenView(ctx : Context) : View(ctx) {
             }
         }
 
-        fun draw(canvas : Canvas, sc : Float, paint : Paint) {
-            canvas.drawCRSNode(i, state.scale, sc, paint)
+        fun draw(canvas : Canvas, sc : Float, currI : Int, paint : Paint) {
+            canvas.drawCRSNode(i, state.scale, sc, currI, paint)
             if (state.scale > 0f) {
-                next?.draw(canvas, state.scale, paint)
+                next?.draw(canvas, state.scale, currI, paint)
             }
         }
 
@@ -171,7 +174,7 @@ class CircleRectScreenView(ctx : Context) : View(ctx) {
         private var dir : Int = 1
 
         fun draw(canvas : Canvas, paint : Paint) {
-            root.draw(canvas, 0f, paint)
+            root.draw(canvas, 0f, curr.i, paint)
         }
 
         fun update(cb : (Float) -> Unit) {
